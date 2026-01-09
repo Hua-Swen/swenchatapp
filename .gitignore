@@ -38,9 +38,10 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-echo "" >> .gitignore
-echo "# RAG documents" >> .gitignore
-echo "rag_service/chemistry_docs/" >> .gitignore
+# RAG data
+rag_service/chemistry_docs/
+rag_service/index/
+rag_service/vectorstore/
 
 # macOS
 .DS_Store
