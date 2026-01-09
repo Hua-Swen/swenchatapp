@@ -6,7 +6,7 @@ class ChemistryChatController < ApplicationController
   def show
   end
 
-  # POST /chemistry_chat/message  (currently hitting #create)
+  # POST /chemistry_chat/message
   def create
     user_message = params[:message].to_s.strip
     k = (params[:k].presence || 5).to_i
