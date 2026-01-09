@@ -37,3 +37,7 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+echo "" >> .gitignore
+echo "# RAG documents" >> .gitignore
+echo "rag_service/chemistry_docs/" >> .gitignore
