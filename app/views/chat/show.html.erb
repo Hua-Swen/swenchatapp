@@ -1,0 +1,199 @@
+<div class="claude-page">
+  <div class="claude-shell">
+    <header class="claude-header">
+      <div class="claude-logo-circle">AI</div>
+      <div class="claude-header-text">
+        <h1>AI Chat</h1>
+        <p>Ask anything. Your Ruby on Rails assistant is ready.</p>
+      </div>
+    </header>
+
+    <main class="claude-main">
+      <div id="chat-window" class="claude-chat-window">
+        <!-- Messages will be appended here -->
+      </div>
+    </main>
+
+    <footer class="claude-footer">
+      <form id="chat-form" class="claude-input-row">
+        <div class="claude-input-wrapper">
+          <textarea
+            id="chat-input"
+            rows="1"
+            placeholder="Message AI..."
+          ></textarea>
+        </div>
+        <button type="submit" class="claude-send-btn" aria-label="Send message">
+          ➤
+        </button>
+        <button type="button" id="mic-btn" class="claude-mic-btn" aria-label="Record voice">
+          🎙
+        </button>
+      </form>
+      <p class="claude-disclaimer">
+        AI may generate inaccurate information. Please verify important details.
+      </p>
+    </footer>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const chatWindow = document.getElementById("chat-window");
+    const chatForm   = document.getElementById("chat-form");
+    const chatInput  = document.getElementById("chat-input");
+
+    let history = []; // {role: "user"|"assistant", content: "..."}
+    const micBtn = document.getElementById("mic-btn");
+    let mediaRecorder = null;
+    let chunks = [];
+    let isRecording = false;
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+
+        const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" });
+
+        const fd = new FormData();
+        fd.append("audio", blob, "recording.webm");
+
+        micBtn.textContent = "⏳";
+
+        const res = await fetch("/speech_to_text", {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: fd
+        });
+
+        const data = await res.json();
+
+        micBtn.textContent = "🎙";
+        micBtn.classList.remove("recording");
+        isRecording = false;
+
+        if (data.error) {
+          appendMessage("assistant", "Transcription error: " + data.error);
+          return;
+        }
+
+        chatInput.value = (chatInput.value + " " + data.transcript).trim();
+        autoResizeTextarea();
+        chatInput.focus();
+
+        // Optional auto-send:
+        // chatForm.requestSubmit();
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+    }
+
+    micBtn.addEventListener("click", async () => {
+      try {
+        if (!isRecording) {
+          isRecording = true;
+          micBtn.classList.add("recording");
+          micBtn.textContent = "■";
+          await startRecording();
+        } else {
+          stopRecording();
+        }
+      } catch (e) {
+        console.error(e);
+        micBtn.classList.remove("recording");
+        micBtn.textContent = "🎙";
+        isRecording = false;
+        appendMessage("assistant", "Mic permission denied or recording failed.");
+      }
+    });
+
+    function autoResizeTextarea() {
+      chatInput.style.height = "auto";
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+    }
+
+    function appendMessage(role, text) {
+      const row = document.createElement("div");
+      row.className = "claude-message-row " + role;
+
+      const avatar = document.createElement("div");
+      avatar.className = "claude-avatar " + role;
+      avatar.textContent = role === "user" ? "You" : "AI";
+
+      const bubble = document.createElement("div");
+      bubble.className = "claude-bubble " + role;
+      bubble.textContent = text;
+
+      if (role === "user") {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+
+      chatWindow.appendChild(row);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    chatForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendMessage("user", text);
+      history.push({ role: "user", content: text });
+      chatInput.value = "";
+      autoResizeTextarea();
+
+      appendMessage("assistant", "Thinking…");
+
+      fetch("<%= chat_path %>", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          message: text,
+          history: history
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const lastRow = chatWindow.lastElementChild;
+          if (lastRow) chatWindow.removeChild(lastRow);
+
+          if (data.error) {
+            appendMessage("assistant", data.error);
+            return;
+          }
+
+          const reply = data.reply;
+          history = data.history;
+          appendMessage("assistant", reply);
+        })
+        .catch(err => {
+          console.error(err);
+          const lastRow = chatWindow.lastElementChild;
+          if (lastRow) chatWindow.removeChild(lastRow);
+          appendMessage("assistant", "Error: could not reach server.");
+        });
+    });
+
+    chatInput.addEventListener("input", autoResizeTextarea);
+    chatInput.focus();
+  })();
+</script>

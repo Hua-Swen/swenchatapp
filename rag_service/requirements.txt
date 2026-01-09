@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+requests
+chromadb
+sentence-transformers
+scikit-learn
+langchain-community
+langchain-text-splitters
+pymupdf

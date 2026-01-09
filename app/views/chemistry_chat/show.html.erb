@@ -1,0 +1,253 @@
+<div class="claude-page">
+  <div class="claude-shell">
+    <header class="claude-header">
+      <div class="claude-logo-circle">AI</div>
+      <div class="claude-header-text">
+        <h1>Chemistry Chat</h1>
+        <p>Ask high school chemistry questions. RAG-enabled tutor.</p>
+      </div>
+    </header>
+
+    <main class="claude-main">
+      <div id="chat-window" class="claude-chat-window">
+        <!-- Messages will be appended here -->
+      </div>
+    </main>
+
+    <footer class="claude-footer">
+      <form id="chat-form" class="claude-input-row">
+        <div class="claude-input-wrapper">
+          <textarea
+            id="chat-input"
+            rows="1"
+            placeholder="Message Chemistry Tutor..."
+          ></textarea>
+        </div>
+        <button type="submit" class="claude-send-btn" aria-label="Send message">
+          ➤
+        </button>
+        <button
+          type="button"
+          id="mic-btn"
+          class="claude-mic-btn"
+          aria-label="Record voice"
+          data-icon-idle="<%= asset_path('mic_idle.png') %>"
+          data-icon-recording="<%= asset_path('mic_recording.png') %>"
+          data-icon-loading="<%= asset_path('mic_loading.png') %>"
+        >
+          <img src="<%= asset_path('mic_idle.png') %>" alt="Mic" />
+        </button>
+      </form>
+      <p class="claude-disclaimer">
+        AI may generate inaccurate information. Please verify important details.
+      </p>
+    </footer>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const chatWindow = document.getElementById("chat-window");
+    const chatForm   = document.getElementById("chat-form");
+    const chatInput  = document.getElementById("chat-input");
+
+    let history = []; // keep client-side history if you want (not required by RAG)
+    const micBtn = document.getElementById("mic-btn");
+    const micImg = micBtn.querySelector("img");
+
+    function setMicIcon(state) {
+      if (!micImg) return;
+
+      if (state === "recording") {
+        micImg.src = micBtn.dataset.iconRecording;
+      } else if (state === "loading") {
+        micImg.src = micBtn.dataset.iconLoading || micBtn.dataset.iconIdle;
+      } else {
+        micImg.src = micBtn.dataset.iconIdle;
+      }
+    }
+
+    let mediaRecorder = null;
+    let chunks = [];
+    let isRecording = false;
+
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+
+        const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" });
+
+        const fd = new FormData();
+        fd.append("audio", blob, "recording.webm");
+
+        setMicIcon("loading");
+
+        const res = await fetch("/speech_to_text", {
+          method: "POST",
+          headers: {
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: fd
+        });
+
+        const data = await res.json();
+
+        setMicIcon("idle");
+        micBtn.classList.remove("recording");
+        isRecording = false;
+
+        if (data.error) {
+          appendMessage("assistant", "Transcription error: " + data.error);
+          return;
+        }
+
+        chatInput.value = (chatInput.value + " " + data.transcript).trim();
+        autoResizeTextarea();
+        chatInput.focus();
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+    }
+
+    micBtn.addEventListener("click", async () => {
+      try {
+        if (!isRecording) {
+          isRecording = true;
+          micBtn.classList.add("recording");
+          setMicIcon("recording");
+          await startRecording();
+        } else {
+          stopRecording();
+        }
+      } catch (e) {
+        console.error(e);
+        micBtn.classList.remove("recording");
+        setMicIcon("idle");
+        isRecording = false;
+        appendMessage("assistant", "Mic permission denied or recording failed.");
+      }
+    });
+
+    function autoResizeTextarea() {
+      chatInput.style.height = "auto";
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+    }
+
+    function formatAssistantText(text) {
+      if (!text) return "";
+
+      // Escape HTML first (basic safety)
+      const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // Convert **bold** → <strong>
+      const bolded = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      // Convert newlines to <br>
+      return bolded.replace(/\n/g, "<br>");
+    }
+
+    function appendMessage(role, text, sources) {
+      const row = document.createElement("div");
+      row.className = "claude-message-row " + role;
+
+      const avatar = document.createElement("div");
+      avatar.className = "claude-avatar " + role;
+      avatar.textContent = role === "user" ? "You" : "AI";
+
+      const bubble = document.createElement("div");
+      bubble.className = "claude-bubble " + role;
+
+      if (role === "assistant") {
+        bubble.innerHTML = formatAssistantText(text);
+      } else {
+        bubble.textContent = text;
+      }
+
+      if (role === "user") {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+
+        // Optional: sources line
+        if (sources && sources.length) {
+          const src = document.createElement("div");
+          src.className = "claude-sources";
+          src.textContent = "Sources: " + sources.join(", ");
+          row.appendChild(src);
+        }
+      }
+
+      chatWindow.appendChild(row);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    chatForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      appendMessage("user", text);
+      history.push({ role: "user", content: text });
+      chatInput.value = "";
+      autoResizeTextarea();
+
+      // placeholder "Thinking…"
+      appendMessage("assistant", "Thinking…");
+
+      // MINIMAL CHANGE: call the ChemistryChat endpoint (not your existing chat_path)
+      fetch("/chemistry_chat/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          message: text,
+          history: history // harmless to send; controller can ignore it
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const lastRow = chatWindow.lastElementChild;
+          if (lastRow) chatWindow.removeChild(lastRow);
+
+          if (data.error) {
+            appendMessage("assistant", data.error);
+            return;
+          }
+
+          const reply = data.reply;
+          const sources = data.sources || [];
+
+          // Keep local history for UI continuity (optional)
+          history.push({ role: "assistant", content: reply });
+
+          appendMessage("assistant", reply, sources);
+        })
+        .catch(err => {
+          console.error(err);
+          const lastRow = chatWindow.lastElementChild;
+          if (lastRow) chatWindow.removeChild(lastRow);
+          appendMessage("assistant", "Error: could not reach server.");
+        });
+    });
+
+    chatInput.addEventListener("input", autoResizeTextarea);
+    chatInput.focus();
+  })();
+</script>

@@ -1,0 +1,264 @@
+/* chat.css – Claude-style chat UI */
+
+/* Layout */
+.claude-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 32px 16px;
+  box-sizing: border-box;  
+  display: flex;
+  justify-content: center;  /* horizontal center */
+  align-items: flex-start;  /* start like Claude, not full vertical center */
+}
+
+
+.claude-shell {
+  width: 100%;
+  max-width: 820px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.claude-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(to right, #f9fafb, #f3f4ff);
+}
+
+.claude-logo-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #111827;
+  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.claude-header-text h1 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.claude-header-text p {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Chat area */
+.claude-main {
+  padding: 12px 0 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+.claude-chat-window {
+  padding: 4px 20px 16px;
+  overflow-y: auto;
+  max-height: 540px;
+}
+
+/* Message bubbles */
+.claude-message-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.claude-message-row.user {
+  justify-content: flex-end;
+}
+
+.claude-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.claude-avatar.assistant {
+  background: #111827;
+  color: #f9fafb;
+}
+
+.claude-avatar.user {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.claude-bubble {
+  max-width: 80%;
+  padding: 10px 12px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.claude-bubble.assistant {
+  background: #f3f4f6;
+  color: #111827;
+  border-top-left-radius: 4px;
+}
+
+.claude-bubble.user {
+  background: #111827;
+  color: #f9fafb;
+  border-top-right-radius: 4px;
+}
+
+/* Footer / input */
+.claude-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 10px 16px 14px;
+  background: #f9fafb;
+}
+
+.claude-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 8px 10px;
+  box-shadow:
+    0 6px 16px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(209, 213, 219, 0.8);
+}
+
+.claude-input-wrapper {
+  flex: 1;
+}
+
+#chat-input {
+  width: 100%;
+  border: none;
+  resize: none;
+  outline: none;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  max-height: 120px;
+  background: transparent;
+}
+
+.claude-send-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px 9px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.35);
+}
+
+.claude-send-btn:hover {
+  background: #020617;
+  transform: translateY(-1px);
+}
+
+.claude-send-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.4);
+}
+
+.claude-disclaimer {
+  margin: 8px 4px 0;
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+/* Small screens */
+@media (max-width: 640px) {
+  .claude-shell {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .claude-chat-window {
+    max-height: calc(100vh - 210px);
+  }
+
+  .claude-bubble {
+    max-width: 100%;
+  }
+}
+
+.claude-mic-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #e5e7eb;
+  color: #111827;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.claude-mic-btn:hover { background: #d1d5db; transform: translateY(-1px); }
+.claude-mic-btn:active { transform: translateY(0); }
+
+.claude-mic-btn.recording {
+  background: #111827;
+  color: #f9fafb;
+}
+
+.claude-mic-btn.recording img {
+  width: 12px;
+  height: 12px;
+  animation: micPulse 1.2s infinite;
+}
+
+@keyframes micPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* --- Mic button: fixed size + icon scaling (override) --- */
+.claude-mic-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;                 /* override padding so image can’t blow up */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure the icon always fits */
+.claude-mic-btn img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
