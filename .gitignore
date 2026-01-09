@@ -41,3 +41,7 @@
 echo "" >> .gitignore
 echo "# RAG documents" >> .gitignore
 echo "rag_service/chemistry_docs/" >> .gitignore
+
+# macOS
+.DS_Store
+**/.DS_Store
