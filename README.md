@@ -2,7 +2,7 @@
 
 This application is a sandbox for me to explore LLM tools and frameworks and apply them to a working application. Here I build an AI chatbot and specialise it for different tasks using RAG.
 
-# Chemistry Chat — Technical Overview
+# Chemistry Chat
 Chemistry Chat is a Retrieval-Augmented Generation (RAG) AI chatbot built to answer high-school-level chemistry questions with higher factual reliability than a standard LLM chatbot.
 
 The retriever model retrieves relevant content from a curated chemistry knowledge base (past year papers in pdf format) and injects it into the model’s prompt at inference time. This reduces hallucinations and keeps responses aligned with syllabus-level material.

@@ -8,10 +8,11 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    <%= favicon_link_tag "pets.png" %>
 
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/pets.png" type="image/png">
+    <link rel="icon" href="/pets.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -19,8 +20,69 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <h1 class="text-4xl font-bold">Welcome to My App!</h1>
-    </main>
+    <div class="home-layout">
+      <aside class="home-sidebar">
+        <div class="home-brand">
+          <div class="home-badge">LLM</div>
+          <div>
+            <div class="home-title">Swen Lab</div>
+          </div>
+        </div>
+
+        <nav class="home-nav">
+          <a class="home-link home-link-primary" href="<%= root_path %>">Home</a>
+          <a class="home-link" href="/chat">AI Chatbot</a>
+          <a class="home-link" href="/chemistry_chat">Chemistry Tutor</a>
+          <!-- <div class="home-nav-section">
+            <div class="home-nav-heading">Experiments</div>
+            <a class="home-link" href="/chat">Math Tutor (RAG)</a>
+            <a class="home-link" href="/chat">Voice Chat (Whisper)</a>
+          </div> -->
+        </nav>
+
+        <div class="home-sidebar-footer">
+          <div class="home-meta">Local dev platform</div>
+          <div class="home-meta">Built to test LLM capabilities</div>
+        </div>
+      </aside>
+
+      <main class="home-main">
+        <header class="home-hero">
+          <h1>Welcome to my LLM testing platform!</h1>
+          <p>
+            This site is a personal sandbox where I prototype and evaluate LLM features end-to-end:
+            prompt design, retrieval-augmented generation (RAG), model routing, and voice transcription. All built into a very simple Ruby on Rails application.
+          </p>
+          <!-- <div class="home-cta-row">
+            <a class="home-btn" href="/chat">Open the AI Chatbot →</a>
+            <a class="home-btn home-btn-secondary" href="#notes">What I’m building</a>
+          </div> -->
+        </header>
+
+        <section class="home-section">
+          <h2 id="notes">What this page includes</h2>
+
+          <article class="home-card">
+            <h3>1) Chatbot</h3>
+            <p>
+              A Rails-based chat UI that uses meta-llama/Llama-3.1-8B-Instruct found on Hugging Face.
+              I also include a speech-to-text transcribing function using whisper.cpp.
+            </p>
+          </article>
+
+          <article class="home-card">
+            <h3>2) Chemistry Tutor (Retrieval Augmented Generation)</h3>
+            <p>
+              The assistant is being specialized for chemistry problems using a RAG pipeline built with LangChain
+              (vector search over curated Singapore chemistry papers). This ground the answer to Singapore Junior College level chemistry syllabus.
+            </p>
+          </article>
+        </section>
+
+        <footer class="home-footer">
+          <span>Hua Swen's playground for LLM experiments</span>
+        </footer>
+      </main>
+    </div>
   </body>
 </html>

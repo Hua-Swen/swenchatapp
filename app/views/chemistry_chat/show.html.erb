@@ -1,10 +1,36 @@
+<div class="home-layout">
+  <aside class="home-sidebar">
+    <div class="home-brand">
+      <div class="home-badge">LLM</div>
+      <div>
+        <div class="home-title">Swen Lab</div>
+      </div>
+    </div>
+
+    <nav class="home-nav">
+      <a class="home-link" href="<%= root_path %>">Home</a>
+      <a class="home-link" href="/chat">AI Chatbot</a>
+      <a class="home-link home-link-primary" href="/chemistry_chat">Chemistry Tutor</a>
+      <!-- <div class="home-nav-section">
+        <div class="home-nav-heading">Experiments</div>
+        <a class="home-link" href="/chat">Math Tutor (RAG)</a>
+        <a class="home-link" href="/chat">Voice Chat (Whisper)</a>
+      </div> -->
+    </nav>
+
+    <div class="home-sidebar-footer">
+      <div class="home-meta">Local dev platform</div>
+      <div class="home-meta">Built to test LLM capabilities</div>
+    </div>
+  </aside>
+</div>
 <div class="claude-page">
   <div class="claude-shell">
     <header class="claude-header">
       <div class="claude-logo-circle">AI</div>
       <div class="claude-header-text">
         <h1>Chemistry Chat</h1>
-        <p>Ask high school chemistry questions. RAG-enabled tutor.</p>
+        <p>Ask me any junior college level chemistry questions! I use a RAG pipeline built with LangChain.</p>
       </div>
     </header>
 
@@ -39,11 +65,12 @@
         </button>
       </form>
       <p class="claude-disclaimer">
-        AI may generate inaccurate information. Please verify important details.
+        This is a prototype chatbot using a local LLM. Responses may be inaccurate or nonsensical!
       </p>
     </footer>
   </div>
 </div>
+
 
 <script>
   (function() {

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  root "home#index"
+  get "/home", to: "home#index"
   get  '/chat', to: 'chat#show'
   post '/chat', to: 'chat#create'
   post "/speech_to_text", to: "speech#create"
@@ -14,8 +16,5 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/*
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-
-  # Defines the root path route ("/")
-  root "home#index"
 
 end

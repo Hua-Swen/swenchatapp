@@ -1,0 +1,241 @@
+/* Simple Home Page Layout with Left Sidebar */
+
+.home-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  background: #ffffff;
+  color: #111827;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
+/* Sidebar */
+.home-sidebar {
+  border-right: 1px solid #e5e7eb;
+  padding: 18px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.home-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #111827;
+  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.home-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+
+.home-subtitle {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.home-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-link {
+  text-decoration: none;
+  color: #111827;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.home-link:hover {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.home-link-primary {
+  background: #111827;
+  color: #f9fafb;
+}
+
+.home-link-primary:hover {
+  background: #020617;
+  border-color: transparent;
+}
+
+.home-nav-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.home-nav-heading {
+  font-size: 0.75rem;
+  color: #6b7280;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 6px 2px;
+}
+
+.home-sidebar-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.home-meta {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Main content */
+.home-main {
+  padding: 28px 28px 18px;
+  max-width: 980px;
+}
+
+.home-hero h1 {
+  margin: 0 0 10px 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.home-hero p {
+  margin: 0 0 16px 0;
+  color: #374151;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.home-cta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #f9fafb;
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.home-btn:hover { background: #020617; transform: translateY(-1px); }
+.home-btn:active { transform: translateY(0); }
+
+.home-btn-secondary {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: none;
+}
+
+.home-btn-secondary:hover { background: #f9fafb; }
+
+.home-section {
+  margin-top: 22px;
+}
+
+.home-section h2 {
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+}
+
+.home-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px 14px;
+  background: #ffffff;
+  margin-bottom: 10px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.home-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+}
+
+.home-card p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.home-steps {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: #374151;
+}
+
+.home-steps a {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-footer {
+  margin-top: 26px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.home-footer-dot { opacity: 0.7; }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .home-sidebar {
+    position: relative;
+    height: auto;
+  }
+
+  .home-main {
+    padding: 18px 16px 16px;
+  }
+}

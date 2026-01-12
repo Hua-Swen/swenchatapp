@@ -1,10 +1,37 @@
+<div class="home-layout">
+  <aside class="home-sidebar">
+    <div class="home-brand">
+      <div class="home-badge">LLM</div>
+      <div>
+        <div class="home-title">Swen Lab</div>
+      </div>
+    </div>
+
+    <nav class="home-nav">
+      <a class="home-link" href="<%= root_path %>">Home</a>
+      <a class="home-link home-link-primary" href="/chat">AI Chatbot</a>
+      <a class="home-link" href="/chemistry_chat">Chemistry Tutor</a>
+      <!-- <div class="home-nav-section">
+        <div class="home-nav-heading">Experiments</div>
+        <a class="home-link" href="/chat">Math Tutor (RAG)</a>
+        <a class="home-link" href="/chat">Voice Chat (Whisper)</a>
+      </div> -->
+    </nav>
+
+    <div class="home-sidebar-footer">
+      <div class="home-meta">Local dev platform</div>
+      <div class="home-meta">Built to test LLM capabilities</div>
+    </div>
+  </aside>
+</div>
+
 <div class="claude-page">
   <div class="claude-shell">
     <header class="claude-header">
       <div class="claude-logo-circle">AI</div>
       <div class="claude-header-text">
         <h1>AI Chat</h1>
-        <p>Ask anything. Your Ruby on Rails assistant is ready.</p>
+        <p>Ask me anything!</p>
       </div>
     </header>
 
@@ -26,12 +53,20 @@
         <button type="submit" class="claude-send-btn" aria-label="Send message">
           ➤
         </button>
-        <button type="button" id="mic-btn" class="claude-mic-btn" aria-label="Record voice">
-          🎙
+        <button
+          type="button"
+          id="mic-btn"
+          class="claude-mic-btn"
+          aria-label="Record voice"
+          data-icon-idle="<%= asset_path('mic_idle.png') %>"
+          data-icon-recording="<%= asset_path('mic_recording.png') %>"
+          data-icon-loading="<%= asset_path('mic_loading.png') %>"
+        >
+          <img src="<%= asset_path('mic_idle.png') %>" alt="Mic" />
         </button>
       </form>
       <p class="claude-disclaimer">
-        AI may generate inaccurate information. Please verify important details.
+        This is a prototype chatbot using a local LLM. Responses may be inaccurate or nonsensical!
       </p>
     </footer>
   </div>
@@ -45,6 +80,20 @@
 
     let history = []; // {role: "user"|"assistant", content: "..."}
     const micBtn = document.getElementById("mic-btn");
+    const micImg = micBtn.querySelector("img");
+
+    function setMicIcon(state) {
+      if (!micImg) return;
+
+      if (state === "recording") {
+        micImg.src = micBtn.dataset.iconRecording;
+      } else if (state === "loading") {
+        micImg.src = micBtn.dataset.iconLoading || micBtn.dataset.iconIdle;
+      } else {
+        micImg.src = micBtn.dataset.iconIdle;
+      }
+    }
+
     let mediaRecorder = null;
     let chunks = [];
     let isRecording = false;
@@ -64,7 +113,7 @@
         const fd = new FormData();
         fd.append("audio", blob, "recording.webm");
 
-        micBtn.textContent = "⏳";
+        setMicIcon("loading");
 
         const res = await fetch("/speech_to_text", {
           method: "POST",
@@ -76,7 +125,7 @@
 
         const data = await res.json();
 
-        micBtn.textContent = "🎙";
+        setMicIcon("idle");
         micBtn.classList.remove("recording");
         isRecording = false;
 
@@ -105,7 +154,7 @@
         if (!isRecording) {
           isRecording = true;
           micBtn.classList.add("recording");
-          micBtn.textContent = "■";
+          setMicIcon("recording");
           await startRecording();
         } else {
           stopRecording();
@@ -113,7 +162,7 @@
       } catch (e) {
         console.error(e);
         micBtn.classList.remove("recording");
-        micBtn.textContent = "🎙";
+        setMicIcon("idle");
         isRecording = false;
         appendMessage("assistant", "Mic permission denied or recording failed.");
       }
